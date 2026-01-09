@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const contentPath = resolve('data', 'content.json');
+const contentPath = fileURLToPath(new URL('../../../data/content.json', import.meta.url));
 
 export async function readContent() {
   const raw = await readFile(contentPath, 'utf-8');
