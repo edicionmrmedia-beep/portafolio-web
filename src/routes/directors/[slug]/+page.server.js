@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { readContent } from '$lib/server/content';
 
-export const load = async ({ params }) => {
-  const content = await readContent();
+export const load = async ({ params, fetch, url }) => {
+  const content = await readContent({ fetch, url });
   const director = content.directors.find((item) => item.slug === params.slug);
 
   if (!director) {

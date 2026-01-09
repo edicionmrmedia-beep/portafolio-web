@@ -24,13 +24,13 @@ const parseList = (value) =>
 
 const unique = (items) => Array.from(new Set(items));
 
-export const load = async () => {
-  const content = await readContent();
+export const load = async ({ fetch, url }) => {
+  const content = await readContent({ fetch, url });
   return { content };
 };
 
 export const actions = {
-  addDirector: async ({ request }) => {
+  addDirector: async ({ request, fetch, url }) => {
     const form = await request.formData();
     const name = form.get('name')?.toString().trim();
     const reelUrl = form.get('reelUrl')?.toString().trim();
@@ -50,33 +50,36 @@ export const actions = {
     }
 
     try {
-      await updateContent((content) => {
-        if (content.directors.some((item) => item.slug === slug)) {
-          throw new Error('Director already exists.');
-        }
+      await updateContent(
+        (content) => {
+          if (content.directors.some((item) => item.slug === slug)) {
+            throw new Error('Director already exists.');
+          }
 
-        const director = {
-          id: slug,
-          slug,
-          name,
-          role: 'Director',
-          image: image || fallbackImage,
-          bio: bio || defaultBio,
-          reelUrl: reelUrl || 'https://player.vimeo.com/video/76979871',
-          selectedWork: selectedRaw ? parseList(selectedRaw) : [],
-          logos: logosRaw ? parseList(logosRaw) : []
-        };
+          const director = {
+            id: slug,
+            slug,
+            name,
+            role: 'Director',
+            image: image || fallbackImage,
+            bio: bio || defaultBio,
+            reelUrl: reelUrl || 'https://player.vimeo.com/video/76979871',
+            selectedWork: selectedRaw ? parseList(selectedRaw) : [],
+            logos: logosRaw ? parseList(logosRaw) : []
+          };
 
-        content.directors.push(director);
-        return content;
-      });
+          content.directors.push(director);
+          return content;
+        },
+        { fetch, url }
+      );
     } catch (error) {
       return fail(400, { message: error.message || 'Unable to add director.' });
     }
 
     return { success: true, message: 'Director added.' };
   },
-  addDop: async ({ request }) => {
+  addDop: async ({ request, fetch, url }) => {
     const form = await request.formData();
     const name = form.get('name')?.toString().trim();
     const reelUrl = form.get('reelUrl')?.toString().trim();
@@ -95,32 +98,35 @@ export const actions = {
     }
 
     try {
-      await updateContent((content) => {
-        if (content.dops.some((item) => item.slug === slug)) {
-          throw new Error('Cinematographer already exists.');
-        }
+      await updateContent(
+        (content) => {
+          if (content.dops.some((item) => item.slug === slug)) {
+            throw new Error('Cinematographer already exists.');
+          }
 
-        const dop = {
-          id: slug,
-          slug,
-          name,
-          role: 'Director of Photography',
-          image: image || fallbackImage,
-          bio: bio || defaultDopBio,
-          reelUrl: reelUrl || 'https://player.vimeo.com/video/50311099',
-          selectedWork: selectedRaw ? parseList(selectedRaw) : []
-        };
+          const dop = {
+            id: slug,
+            slug,
+            name,
+            role: 'Director of Photography',
+            image: image || fallbackImage,
+            bio: bio || defaultDopBio,
+            reelUrl: reelUrl || 'https://player.vimeo.com/video/50311099',
+            selectedWork: selectedRaw ? parseList(selectedRaw) : []
+          };
 
-        content.dops.push(dop);
-        return content;
-      });
+          content.dops.push(dop);
+          return content;
+        },
+        { fetch, url }
+      );
     } catch (error) {
       return fail(400, { message: error.message || 'Unable to add cinematographer.' });
     }
 
     return { success: true, message: 'Cinematographer added.' };
   },
-  addWork: async ({ request }) => {
+  addWork: async ({ request, fetch, url }) => {
     const form = await request.formData();
     const title = form.get('title')?.toString().trim();
     const client = form.get('client')?.toString().trim();
@@ -137,40 +143,43 @@ export const actions = {
     const id = slugify(`${client}-${title}`);
 
     try {
-      await updateContent((content) => {
-        if (content.work.some((item) => item.id === id)) {
-          throw new Error('Work entry already exists.');
-        }
-
-        const entry = {
-          id,
-          title,
-          client,
-          year: year || '2024',
-          videoUrl,
-          image: image || fallbackImage,
-          director: directorSlug || null,
-          dop: dopSlug || null
-        };
-
-        content.work.unshift(entry);
-
-        if (directorSlug) {
-          const director = content.directors.find((item) => item.slug === directorSlug);
-          if (director) {
-            director.selectedWork = unique([id, ...(director.selectedWork || [])]);
+      await updateContent(
+        (content) => {
+          if (content.work.some((item) => item.id === id)) {
+            throw new Error('Work entry already exists.');
           }
-        }
 
-        if (dopSlug) {
-          const dop = content.dops.find((item) => item.slug === dopSlug);
-          if (dop) {
-            dop.selectedWork = unique([id, ...(dop.selectedWork || [])]);
+          const entry = {
+            id,
+            title,
+            client,
+            year: year || '2024',
+            videoUrl,
+            image: image || fallbackImage,
+            director: directorSlug || null,
+            dop: dopSlug || null
+          };
+
+          content.work.unshift(entry);
+
+          if (directorSlug) {
+            const director = content.directors.find((item) => item.slug === directorSlug);
+            if (director) {
+              director.selectedWork = unique([id, ...(director.selectedWork || [])]);
+            }
           }
-        }
 
-        return content;
-      });
+          if (dopSlug) {
+            const dop = content.dops.find((item) => item.slug === dopSlug);
+            if (dop) {
+              dop.selectedWork = unique([id, ...(dop.selectedWork || [])]);
+            }
+          }
+
+          return content;
+        },
+        { fetch, url }
+      );
     } catch (error) {
       return fail(400, { message: error.message || 'Unable to add work.' });
     }
