@@ -1,0 +1,194 @@
+{
+  "site": {
+    "name": "The Founders",
+    "tagline": "High-End Direction & Production Studio",
+    "email": "hello@thefounders.studio",
+    "instagram": "https://instagram.com/thefounders",
+    "location": "Mexico City"
+  },
+  "directors": [
+    {
+      "id": "sofia-mora",
+      "slug": "sofia-mora",
+      "name": "Sofia Mora",
+      "role": "Director",
+      "image": "linear-gradient(140deg, #c4a46d 0%, #8b6442 42%, #2b1b12 100%)",
+      "bio": "Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.",
+      "reelUrl": "https://player.vimeo.com/video/76979871",
+      "selectedWork": [
+        "atlas-sustain",
+        "pasa-true-north",
+        "lumen-collection"
+      ],
+      "logos": [
+        "Nike",
+        "Apple",
+        "Cartier",
+        "Adidas"
+      ]
+    },
+    {
+      "id": "adrian-velez",
+      "slug": "adrian-velez",
+      "name": "Adrian Velez",
+      "role": "Director",
+      "image": "linear-gradient(140deg, #8f9b93 0%, #3a4c43 55%, #171f1c 100%)",
+      "bio": "Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.",
+      "reelUrl": "https://player.vimeo.com/video/357274789",
+      "selectedWork": [
+        "verra-chapter-one",
+        "monolith-shift",
+        "kinetic-arc"
+      ],
+      "logos": [
+        "Google",
+        "Samsung",
+        "Louis Vuitton"
+      ]
+    },
+    {
+      "id": "lucia-ferretti",
+      "slug": "lucia-ferretti",
+      "name": "Lucia Ferretti",
+      "role": "Director",
+      "image": "linear-gradient(140deg, #c2b9a9 0%, #8a7e6b 50%, #2b2620 100%)",
+      "bio": "Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.",
+      "reelUrl": "https://player.vimeo.com/video/22439234",
+      "selectedWork": [
+        "oleo-fragment",
+        "casa-luz",
+        "verra-chapter-one"
+      ],
+      "logos": [
+        "Chanel",
+        "Mercedes-Benz",
+        "Spotify"
+      ]
+    },
+    {
+      "id": "misael-rangel",
+      "slug": "misael-rangel",
+      "name": "Misael Rangel",
+      "role": "Director",
+      "image": "linear-gradient(140deg, #cdb08a 0%, #8a6b4f 55%, #2b1c18 100%)",
+      "bio": "Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.",
+      "reelUrl": "https://vimeo.com/1152673167?fl=ip&fe=ec",
+      "selectedWork": [],
+      "logos": []
+    }
+  ],
+  "dops": [
+    {
+      "id": "nico-ledesma",
+      "slug": "nico-ledesma",
+      "name": "Nico Ledesma",
+      "role": "Director of Photography",
+      "image": "linear-gradient(140deg, #b1b7c2 0%, #5e6572 55%, #1c212b 100%)",
+      "bio": "Cinematographer specializing in high-end advertising and branded content productions.",
+      "reelUrl": "https://player.vimeo.com/video/1084537",
+      "selectedWork": [
+        "atlas-sustain",
+        "monolith-shift",
+        "casa-luz",
+        "lumen-collection"
+      ]
+    },
+    {
+      "id": "camila-rojas",
+      "slug": "camila-rojas",
+      "name": "Camila Rojas",
+      "role": "Director of Photography",
+      "image": "linear-gradient(140deg, #cab0a2 0%, #8c6f60 52%, #2b1c18 100%)",
+      "bio": "Cinematographer specializing in high-end advertising and branded content productions.",
+      "reelUrl": "https://player.vimeo.com/video/50311099",
+      "selectedWork": [
+        "verra-chapter-one",
+        "pasa-true-north",
+        "oleo-fragment",
+        "kinetic-arc"
+      ]
+    }
+  ],
+  "work": [
+    {
+      "id": "atlas-sustain",
+      "title": "Sustain",
+      "client": "Atlas",
+      "year": "2024",
+      "videoUrl": "https://player.vimeo.com/video/76979871",
+      "image": "linear-gradient(140deg, #c4a46d 0%, #9b7650 60%, #3a2518 100%)",
+      "director": "sofia-mora",
+      "dop": "nico-ledesma"
+    },
+    {
+      "id": "verra-chapter-one",
+      "title": "Chapter One",
+      "client": "Verra",
+      "year": "2023",
+      "videoUrl": "https://player.vimeo.com/video/357274789",
+      "image": "linear-gradient(140deg, #8f9b93 0%, #5f6f68 50%, #202824 100%)",
+      "director": "adrian-velez",
+      "dop": "camila-rojas"
+    },
+    {
+      "id": "monolith-shift",
+      "title": "Shift",
+      "client": "Monolith",
+      "year": "2022",
+      "videoUrl": "https://player.vimeo.com/video/22439234",
+      "image": "linear-gradient(140deg, #8c8f96 0%, #575b64 55%, #1c1e24 100%)",
+      "director": "adrian-velez",
+      "dop": "nico-ledesma"
+    },
+    {
+      "id": "pasa-true-north",
+      "title": "True North",
+      "client": "Pasa",
+      "year": "2024",
+      "videoUrl": "https://player.vimeo.com/video/50311099",
+      "image": "linear-gradient(140deg, #caa67a 0%, #a17d56 55%, #3a2518 100%)",
+      "director": "sofia-mora",
+      "dop": "camila-rojas"
+    },
+    {
+      "id": "oleo-fragment",
+      "title": "Fragment",
+      "client": "Oleo",
+      "year": "2023",
+      "videoUrl": "https://player.vimeo.com/video/1084537",
+      "image": "linear-gradient(140deg, #c4b9a5 0%, #827765 50%, #2b2620 100%)",
+      "director": "lucia-ferretti",
+      "dop": "camila-rojas"
+    },
+    {
+      "id": "casa-luz",
+      "title": "Luz",
+      "client": "Casa",
+      "year": "2022",
+      "videoUrl": "https://player.vimeo.com/video/76979871",
+      "image": "linear-gradient(140deg, #b7c0c6 0%, #6b7680 55%, #222831 100%)",
+      "director": "lucia-ferretti",
+      "dop": "nico-ledesma"
+    },
+    {
+      "id": "kinetic-arc",
+      "title": "Arc",
+      "client": "Kinetic",
+      "year": "2021",
+      "videoUrl": "https://player.vimeo.com/video/357274789",
+      "image": "linear-gradient(140deg, #7f8b7f 0%, #455148 52%, #1a201b 100%)",
+      "director": "adrian-velez",
+      "dop": "camila-rojas"
+    },
+    {
+      "id": "lumen-collection",
+      "title": "Collection",
+      "client": "Lumen",
+      "year": "2024",
+      "videoUrl": "https://player.vimeo.com/video/22439234",
+      "image": "linear-gradient(140deg, #cdb08a 0%, #a07a57 50%, #3a2518 100%)",
+      "director": "sofia-mora",
+      "dop": "nico-ledesma"
+    }
+  ]
+}
