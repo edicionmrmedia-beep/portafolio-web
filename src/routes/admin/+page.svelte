@@ -1,7 +1,19 @@
 <script>
+  import WorkListEditor from "$lib/components/WorkListEditor.svelte";
+
   let { data, form } = $props();
 
   const content = $derived(data.content);
+  const resolveSelectedWork = (items = []) => {
+    const workList = content?.work || [];
+    return items
+      .map((item) =>
+        typeof item === "string"
+          ? workList.find((workItem) => workItem.id === item)
+          : item
+      )
+      .filter(Boolean);
+  };
 </script>
 
 <svelte:head>
@@ -33,34 +45,8 @@
             <input name="client" placeholder="Brand or client" required />
           </label>
           <label>
-            Year
-            <input name="year" placeholder="2024" />
-          </label>
-          <label>
             Video URL
             <input name="videoUrl" placeholder="https://player.vimeo.com/..." required />
-          </label>
-          <label>
-            Image (optional)
-            <input name="image" placeholder="Linear gradient or image URL" />
-          </label>
-          <label>
-            Director
-            <select name="director">
-              <option value="">None</option>
-              {#each content.directors as director}
-                <option value={director.slug}>{director.name}</option>
-              {/each}
-            </select>
-          </label>
-          <label>
-            DOP
-            <select name="dop">
-              <option value="">None</option>
-              {#each content.dops as dop}
-                <option value={dop.slug}>{dop.name}</option>
-              {/each}
-            </select>
           </label>
           <button class="button" type="submit">Add work</button>
         </form>
@@ -78,21 +64,10 @@
             <input name="reelUrl" placeholder="https://player.vimeo.com/..." />
           </label>
           <label>
-            Image (optional)
-            <input name="image" placeholder="Linear gradient or image URL" />
-          </label>
-          <label>
             Bio (optional)
             <textarea name="bio" rows="3"></textarea>
           </label>
-          <label>
-            Logos (comma separated)
-            <input name="logos" placeholder="Nike, Apple, Cartier" />
-          </label>
-          <label>
-            Selected work IDs (comma separated)
-            <input name="selectedWork" placeholder="atlas-sustain, lumen-collection" />
-          </label>
+          <WorkListEditor name="selectedWork" />
           <button class="button" type="submit">Add director</button>
         </form>
       </fieldset>
@@ -109,17 +84,10 @@
             <input name="reelUrl" placeholder="https://player.vimeo.com/..." />
           </label>
           <label>
-            Image (optional)
-            <input name="image" placeholder="Linear gradient or image URL" />
-          </label>
-          <label>
             Bio (optional)
             <textarea name="bio" rows="3"></textarea>
           </label>
-          <label>
-            Selected work IDs (comma separated)
-            <input name="selectedWork" placeholder="atlas-sustain, kinetic-arc" />
-          </label>
+          <WorkListEditor name="selectedWork" />
           <button class="button" type="submit">Add DOP</button>
         </form>
       </fieldset>
@@ -128,27 +96,94 @@
     <div class="admin-list">
       <div>
         <h2>Directors</h2>
-        <ul>
-          {#each content.directors as director}
-            <li>{director.name} ({director.slug})</li>
+        <div class="admin-edit-list">
+          {#each content.directors as director (director.id || director.slug || director.name)}
+            {@const directorWork = resolveSelectedWork(director.selectedWork)}
+            <form class="admin-edit" method="post" action="?/updateDirector">
+              <input type="hidden" name="id" value={director.id || director.slug} />
+              <div class="admin-edit-id">ID: {director.id || director.slug}</div>
+              <label>
+                Name
+                <input name="name" value={director.name} required />
+              </label>
+              <label>
+                Reel URL
+                <input name="reelUrl" value={director.reelUrl} />
+              </label>
+              <label>
+                Bio (optional)
+                <textarea name="bio" rows="3">{director.bio}</textarea>
+              </label>
+              <WorkListEditor name="selectedWork" value={directorWork} />
+              <div class="admin-edit-actions">
+                <button class="button" type="submit">Save</button>
+                <button class="button danger" type="submit" formaction="?/deleteDirector">
+                  Delete
+                </button>
+              </div>
+            </form>
           {/each}
-        </ul>
+        </div>
       </div>
       <div>
         <h2>Cinematographers</h2>
-        <ul>
-          {#each content.dops as dop}
-            <li>{dop.name} ({dop.slug})</li>
+        <div class="admin-edit-list">
+          {#each content.dops as dop (dop.id || dop.slug || dop.name)}
+            {@const dopWork = resolveSelectedWork(dop.selectedWork)}
+            <form class="admin-edit" method="post" action="?/updateDop">
+              <input type="hidden" name="id" value={dop.id || dop.slug} />
+              <div class="admin-edit-id">ID: {dop.id || dop.slug}</div>
+              <label>
+                Name
+                <input name="name" value={dop.name} required />
+              </label>
+              <label>
+                Reel URL
+                <input name="reelUrl" value={dop.reelUrl} />
+              </label>
+              <label>
+                Bio (optional)
+                <textarea name="bio" rows="3">{dop.bio}</textarea>
+              </label>
+              <WorkListEditor name="selectedWork" value={dopWork} />
+              <div class="admin-edit-actions">
+                <button class="button" type="submit">Save</button>
+                <button class="button danger" type="submit" formaction="?/deleteDop">
+                  Delete
+                </button>
+              </div>
+            </form>
           {/each}
-        </ul>
+        </div>
       </div>
       <div>
         <h2>Work</h2>
-        <ul>
-          {#each content.work as item}
-            <li>{item.client} - {item.title} ({item.id})</li>
+        <div class="admin-edit-list">
+          {#each content.work as item (item.id)}
+            <form class="admin-edit" method="post" action="?/updateWork">
+              <input type="hidden" name="id" value={item.id} />
+              <div class="admin-edit-id">ID: {item.id}</div>
+              <label>
+                Title
+                <input name="title" value={item.title} required />
+              </label>
+              <label>
+                Client
+                <input name="client" value={item.client} required />
+              </label>
+              <label>
+                Video URL
+                <input name="videoUrl" value={item.videoUrl} required />
+              </label>
+              <div class="admin-edit-actions">
+                <button class="button" type="submit">Save</button>
+                <button class="button danger" type="submit" formaction="?/deleteWork">
+                  Delete
+                </button>
+              </div>
+            </form>
           {/each}
-        </ul>
+        </div>
       </div>
     </div>
   </div>

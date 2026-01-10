@@ -1,6 +1,7 @@
 <script>
   import '../app.css';
   import favicon from '$lib/assets/favicon.svg';
+  import { page } from '$app/stores';
 
   let { children, data } = $props();
 
@@ -22,7 +23,7 @@
   />
 </svelte:head>
 
-<div class="site">
+<div class="site" class:work-page={$page.url.pathname === '/work'}>
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="/">The Founders</a>

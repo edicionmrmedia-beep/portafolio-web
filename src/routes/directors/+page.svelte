@@ -4,9 +4,12 @@
   const directors = $derived(data.content.directors);
   const reelParams =
     "background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0";
+  const resolveId = (person) => person.id || person.slug || "";
   let selectedId = $state("");
   const selectedDirector = $derived(
-    selectedId ? directors.find((item) => item.id === selectedId) : null
+    selectedId
+      ? directors.find((item) => (item.id || item.slug) === selectedId)
+      : null
   );
   const selectedReel = $derived.by(() => {
     if (!selectedDirector) {
@@ -41,10 +44,10 @@
       <div class="director-minimal" on:mouseleave={() => (selectedId = "")}>
         {#each directors as director}
           <a
-            href={`/directors/${director.slug}`}
-            class:selected={selectedId === director.id}
-            on:mouseenter={() => (selectedId = director.id)}
-            on:focus={() => (selectedId = director.id)}
+            href={`/directors/${director.slug || director.id}`}
+            class:selected={selectedId === resolveId(director)}
+            on:mouseenter={() => (selectedId = resolveId(director))}
+            on:focus={() => (selectedId = resolveId(director))}
           >
             {director.name}
           </a>

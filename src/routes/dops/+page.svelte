@@ -4,9 +4,10 @@
   const dops = $derived(data.content.dops);
   const reelParams =
     "background=1&autoplay=1&loop=1&muted=1&title=0&byline=0&portrait=0";
+  const resolveId = (person) => person.id || person.slug || "";
   let selectedId = $state("");
   const selectedDop = $derived(
-    selectedId ? dops.find((item) => item.id === selectedId) : null
+    selectedId ? dops.find((item) => (item.id || item.slug) === selectedId) : null
   );
   const selectedReel = $derived.by(() => {
     if (!selectedDop) {
@@ -41,10 +42,10 @@
       <div class="director-minimal" on:mouseleave={() => (selectedId = "")}>
         {#each dops as dop}
           <a
-            href={`/dops/${dop.slug}`}
-            class:selected={selectedId === dop.id}
-            on:mouseenter={() => (selectedId = dop.id)}
-            on:focus={() => (selectedId = dop.id)}
+            href={`/dops/${dop.slug || dop.id}`}
+            class:selected={selectedId === resolveId(dop)}
+            on:mouseenter={() => (selectedId = resolveId(dop))}
+            on:focus={() => (selectedId = resolveId(dop))}
           >
             {dop.name}
           </a>

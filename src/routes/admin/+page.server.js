@@ -5,7 +5,8 @@ const defaultBio =
   'Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.';
 const defaultDopBio =
   'Cinematographer specializing in high-end advertising and branded content productions.';
-const fallbackImage = 'linear-gradient(140deg, #cdb08a 0%, #8a6b4f 55%, #2b1c18 100%)';
+
+const matchesId = (item, id) => item?.id === id || item?.slug === id;
 
 const slugify = (value) => {
   return value
@@ -16,13 +17,34 @@ const slugify = (value) => {
     .replace(/(^-|-$)/g, '');
 };
 
-const parseList = (value) =>
-  value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
+const parseSelectedWork = (value) => {
+  if (!value) {
+    return [];
+  }
 
-const unique = (items) => Array.from(new Set(items));
+  let parsed;
+  try {
+    parsed = JSON.parse(value);
+  } catch (error) {
+    throw new Error('Work list must be valid JSON.');
+  }
+
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+
+  return parsed
+    .map((item) => ({
+      title: item?.title?.toString().trim() || '',
+      client: item?.client?.toString().trim() || '',
+      videoUrl: item?.videoUrl?.toString().trim() || ''
+    }))
+    .filter((item) => item.title && item.client)
+    .map((item) => ({
+      id: slugify(`${item.client}-${item.title}`),
+      ...item
+    }));
+};
 
 export const load = async ({ fetch, url }) => {
   const content = await readContent({ fetch, url });
@@ -34,38 +56,39 @@ export const actions = {
     const form = await request.formData();
     const name = form.get('name')?.toString().trim();
     const reelUrl = form.get('reelUrl')?.toString().trim();
-    const image = form.get('image')?.toString().trim();
     const bio = form.get('bio')?.toString().trim();
-    const logosRaw = form.get('logos')?.toString().trim();
     const selectedRaw = form.get('selectedWork')?.toString().trim();
 
     if (!name) {
       return fail(400, { message: 'Name is required.' });
     }
 
-    const slug = slugify(name);
+    const id = slugify(name);
 
-    if (!slug) {
+    if (!id) {
       return fail(400, { message: 'Name must include letters or numbers.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
     }
 
     try {
       await updateContent(
         (content) => {
-          if (content.directors.some((item) => item.slug === slug)) {
+          if (content.directors.some((item) => matchesId(item, id))) {
             throw new Error('Director already exists.');
           }
 
           const director = {
-            id: slug,
-            slug,
+            id,
             name,
-            role: 'Director',
-            image: image || fallbackImage,
             bio: bio || defaultBio,
             reelUrl: reelUrl || 'https://player.vimeo.com/video/76979871',
-            selectedWork: selectedRaw ? parseList(selectedRaw) : [],
-            logos: logosRaw ? parseList(logosRaw) : []
+            selectedWork
           };
 
           content.directors.push(director);
@@ -83,7 +106,6 @@ export const actions = {
     const form = await request.formData();
     const name = form.get('name')?.toString().trim();
     const reelUrl = form.get('reelUrl')?.toString().trim();
-    const image = form.get('image')?.toString().trim();
     const bio = form.get('bio')?.toString().trim();
     const selectedRaw = form.get('selectedWork')?.toString().trim();
 
@@ -91,28 +113,32 @@ export const actions = {
       return fail(400, { message: 'Name is required.' });
     }
 
-    const slug = slugify(name);
+    const id = slugify(name);
 
-    if (!slug) {
+    if (!id) {
       return fail(400, { message: 'Name must include letters or numbers.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
     }
 
     try {
       await updateContent(
         (content) => {
-          if (content.dops.some((item) => item.slug === slug)) {
+          if (content.dops.some((item) => matchesId(item, id))) {
             throw new Error('Cinematographer already exists.');
           }
 
           const dop = {
-            id: slug,
-            slug,
+            id,
             name,
-            role: 'Director of Photography',
-            image: image || fallbackImage,
             bio: bio || defaultDopBio,
             reelUrl: reelUrl || 'https://player.vimeo.com/video/50311099',
-            selectedWork: selectedRaw ? parseList(selectedRaw) : []
+            selectedWork
           };
 
           content.dops.push(dop);
@@ -130,11 +156,7 @@ export const actions = {
     const form = await request.formData();
     const title = form.get('title')?.toString().trim();
     const client = form.get('client')?.toString().trim();
-    const year = form.get('year')?.toString().trim();
     const videoUrl = form.get('videoUrl')?.toString().trim();
-    const image = form.get('image')?.toString().trim();
-    const directorSlug = form.get('director')?.toString().trim();
-    const dopSlug = form.get('dop')?.toString().trim();
 
     if (!title || !client || !videoUrl) {
       return fail(400, { message: 'Title, client, and video URL are required.' });
@@ -153,28 +175,10 @@ export const actions = {
             id,
             title,
             client,
-            year: year || '2024',
-            videoUrl,
-            image: image || fallbackImage,
-            director: directorSlug || null,
-            dop: dopSlug || null
+            videoUrl
           };
 
           content.work.unshift(entry);
-
-          if (directorSlug) {
-            const director = content.directors.find((item) => item.slug === directorSlug);
-            if (director) {
-              director.selectedWork = unique([id, ...(director.selectedWork || [])]);
-            }
-          }
-
-          if (dopSlug) {
-            const dop = content.dops.find((item) => item.slug === dopSlug);
-            if (dop) {
-              dop.selectedWork = unique([id, ...(dop.selectedWork || [])]);
-            }
-          }
 
           return content;
         },
@@ -185,5 +189,216 @@ export const actions = {
     }
 
     return { success: true, message: 'Work added.' };
+  },
+  updateDirector: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+    const name = form.get('name')?.toString().trim();
+    const reelUrl = form.get('reelUrl')?.toString().trim();
+    const bio = form.get('bio')?.toString().trim();
+    const selectedRaw = form.get('selectedWork')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Director id is required.' });
+    }
+
+    if (!name) {
+      return fail(400, { message: 'Name is required.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const director = content.directors.find((item) => matchesId(item, id));
+          if (!director) {
+            throw new Error('Director not found.');
+          }
+
+          director.name = name;
+          director.reelUrl = reelUrl || director.reelUrl || 'https://player.vimeo.com/video/76979871';
+          director.bio = bio || director.bio || defaultBio;
+          director.selectedWork = selectedWork;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to update director.' });
+    }
+
+    return { success: true, message: 'Director updated.' };
+  },
+  deleteDirector: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Director id is required.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const next = content.directors.filter((item) => !matchesId(item, id));
+          if (next.length === content.directors.length) {
+            throw new Error('Director not found.');
+          }
+
+          content.directors = next;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to delete director.' });
+    }
+
+    return { success: true, message: 'Director deleted.' };
+  },
+  updateDop: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+    const name = form.get('name')?.toString().trim();
+    const reelUrl = form.get('reelUrl')?.toString().trim();
+    const bio = form.get('bio')?.toString().trim();
+    const selectedRaw = form.get('selectedWork')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Cinematographer id is required.' });
+    }
+
+    if (!name) {
+      return fail(400, { message: 'Name is required.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const dop = content.dops.find((item) => matchesId(item, id));
+          if (!dop) {
+            throw new Error('Cinematographer not found.');
+          }
+
+          dop.name = name;
+          dop.reelUrl = reelUrl || dop.reelUrl || 'https://player.vimeo.com/video/50311099';
+          dop.bio = bio || dop.bio || defaultDopBio;
+          dop.selectedWork = selectedWork;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to update cinematographer.' });
+    }
+
+    return { success: true, message: 'Cinematographer updated.' };
+  },
+  deleteDop: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Cinematographer id is required.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const next = content.dops.filter((item) => !matchesId(item, id));
+          if (next.length === content.dops.length) {
+            throw new Error('Cinematographer not found.');
+          }
+
+          content.dops = next;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to delete cinematographer.' });
+    }
+
+    return { success: true, message: 'Cinematographer deleted.' };
+  },
+  updateWork: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+    const title = form.get('title')?.toString().trim();
+    const client = form.get('client')?.toString().trim();
+    const videoUrl = form.get('videoUrl')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Work ID is required.' });
+    }
+
+    if (!title || !client || !videoUrl) {
+      return fail(400, { message: 'Title, client, and video URL are required.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const index = content.work.findIndex((item) => item.id === id);
+          if (index < 0) {
+            throw new Error('Work entry not found.');
+          }
+
+          content.work[index] = {
+            id,
+            title,
+            client,
+            videoUrl
+          };
+
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to update work.' });
+    }
+
+    return { success: true, message: 'Work updated.' };
+  },
+  deleteWork: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Work ID is required.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const next = content.work.filter((item) => item.id !== id);
+          if (next.length === content.work.length) {
+            throw new Error('Work entry not found.');
+          }
+
+          content.work = next;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to delete work.' });
+    }
+
+    return { success: true, message: 'Work deleted.' };
   }
 };
