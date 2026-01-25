@@ -23,7 +23,11 @@
   />
 </svelte:head>
 
-<div class="site" class:work-page={$page.url.pathname === '/work'}>
+<div
+  class="site"
+  class:work-page={$page.url.pathname === '/work'}
+  class:home-page={$page.url.pathname === '/'}
+>
   <header class="site-header">
     <div class="container header-inner">
       <a class="logo" href="/">The Founders</a>

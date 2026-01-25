@@ -9,7 +9,7 @@
   const selectedDirector = $derived(
     selectedId
       ? directors.find((item) => (item.id || item.slug) === selectedId)
-      : null
+      : null,
   );
   const selectedReel = $derived.by(() => {
     if (!selectedDirector) {
@@ -25,34 +25,32 @@
   <title>Directors | {data.content.site.name}</title>
 </svelte:head>
 
-<section class="section">
-  <div class="directors-stage">
-    {#if selectedDirector}
-      <div class="directors-bg">
-        <iframe
-          src={selectedReel}
-          title={`${selectedDirector.name} reel`}
-          frameborder="0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-        ></iframe>
-      </div>
-      <div class="directors-overlay"></div>
-    {/if}
+<div class="directors-stage">
+  {#if selectedDirector}
+    <div class="directors-bg">
+      <iframe
+        src={selectedReel}
+        title={`${selectedDirector.name} reel`}
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+    <div class="directors-overlay"></div>
+  {/if}
 
-    <div class="container directors-content">
-      <div class="director-minimal" on:mouseleave={() => (selectedId = "")}>
-        {#each directors as director}
-          <a
-            href={`/directors/${director.slug || director.id}`}
-            class:selected={selectedId === resolveId(director)}
-            on:mouseenter={() => (selectedId = resolveId(director))}
-            on:focus={() => (selectedId = resolveId(director))}
-          >
-            {director.name}
-          </a>
-        {/each}
-      </div>
+  <div class="container directors-content">
+    <div class="director-minimal" on:mouseleave={() => (selectedId = "")}>
+      {#each directors as director}
+        <a
+          href={`/directors/${director.slug || director.id}`}
+          class:selected={selectedId === resolveId(director)}
+          on:mouseenter={() => (selectedId = resolveId(director))}
+          on:focus={() => (selectedId = resolveId(director))}
+        >
+          {director.name}
+        </a>
+      {/each}
     </div>
   </div>
-</section>
+</div>
