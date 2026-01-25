@@ -27,6 +27,24 @@
 
   const isVimeo = (url) => Boolean(url && url.includes("vimeo.com"));
 
+  const getVideoLink = (url) => {
+    if (!url) {
+      return "";
+    }
+
+    const playerMatch = url.match(/player\.vimeo\.com\/video\/(\d+)/);
+    if (playerMatch) {
+      return `https://vimeo.com/${playerMatch[1]}`;
+    }
+
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) {
+      return `https://vimeo.com/${vimeoMatch[1]}`;
+    }
+
+    return url;
+  };
+
   onMount(() => {
     const videos = Array.from(
       document.querySelectorAll(".work-project video")
@@ -71,6 +89,15 @@
   {#each work as item}
     <article class="work-project">
       <div class="work-media">
+        {#if getVideoLink(item.videoUrl)}
+          <a
+            class="work-media-link"
+            href={getVideoLink(item.videoUrl)}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${item.title} video`}
+          ></a>
+        {/if}
         {#if isVimeo(item.videoUrl)}
           <iframe
             src={buildVimeoEmbed(item.videoUrl)}
