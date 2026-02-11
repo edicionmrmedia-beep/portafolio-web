@@ -1,17 +1,17 @@
 <script>
-  import '../app.css';
-  import favicon from '$lib/assets/favicon.svg';
-  import { page } from '$app/stores';
+  import "../app.css";
+  import favicon from "$lib/assets/favicon.svg";
+  import { page } from "$app/stores";
 
   let { children, data } = $props();
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/directors', label: 'Directors' },
-    { href: '/dops', label: 'DOPs' },
-    { href: '/work', label: 'Work' },
-    { href: '/contact', label: 'Contact' }
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/directors", label: "Directors" },
+    { href: "/dops", label: "DOPs" },
+    { href: "/work", label: "Work" },
+    { href: "/contact", label: "Contact" },
   ];
 </script>
 
@@ -25,8 +25,8 @@
 
 <div
   class="site"
-  class:work-page={$page.url.pathname === '/work'}
-  class:home-page={$page.url.pathname === '/'}
+  class:work-page={$page.url.pathname === "/work"}
+  class:home-page={$page.url.pathname === "/"}
 >
   <header class="site-header">
     <div class="container header-inner">
@@ -38,7 +38,9 @@
       </nav>
       <div class="header-meta">
         <span>{data.content.site.location}</span>
-        <a href={`mailto:${data.content.site.email}`}>{data.content.site.email}</a>
+        <a href={`mailto:${data.content.site.email}`}
+          >{data.content.site.email}</a
+        >
       </div>
     </div>
   </header>
@@ -54,8 +56,9 @@
         <p>High-End Direction & Production Studio</p>
       </div>
       <div class="footer-links">
-        <a href={`mailto:${data.content.site.email}`}>{data.content.site.email}</a>
-        <a href={data.content.site.instagram} target="_blank" rel="noreferrer">Instagram</a>
+        <a href={`mailto:${data.content.site.email}`}
+          >{data.content.site.email}</a
+        >
       </div>
     </div>
   </footer>
