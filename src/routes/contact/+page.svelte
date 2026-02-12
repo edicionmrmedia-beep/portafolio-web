@@ -14,10 +14,9 @@
     </div>
     <p>Based in Mexico City. Available for worldwide productions.</p>
     <div class="contact-links">
-      <a class="button" href={`mailto:${data.content.site.email}`}>{data.content.site.email}</a>
-      <a class="button" href={data.content.site.instagram} target="_blank" rel="noreferrer">
-        Instagram
-      </a>
+      <a class="button" href={`mailto:${data.content.site.email}`}
+        >{data.content.site.email}</a
+      >
     </div>
   </div>
 </section>
