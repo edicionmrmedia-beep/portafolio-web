@@ -32,9 +32,8 @@
       return "";
     }
 
-    const playerMatch = url.match(/player\.vimeo\.com\/video\/(\d+)/);
-    if (playerMatch) {
-      return `https://vimeo.com/${playerMatch[1]}`;
+    if (url.includes("player.vimeo.com/video/")) {
+      return url;
     }
 
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
