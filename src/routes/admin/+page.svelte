@@ -91,6 +91,26 @@
           <button class="button" type="submit">Add DOP</button>
         </form>
       </fieldset>
+
+      <fieldset>
+        <legend>Add post-production</legend>
+        <form method="post" action="?/addPostProduction">
+          <label>
+            Name
+            <input name="name" placeholder="Full name" required />
+          </label>
+          <label>
+            Reel URL
+            <input name="reelUrl" placeholder="https://player.vimeo.com/..." />
+          </label>
+          <label>
+            Bio (optional)
+            <textarea name="bio" rows="3"></textarea>
+          </label>
+          <WorkListEditor name="selectedWork" />
+          <button class="button" type="submit">Add post-production</button>
+        </form>
+      </fieldset>
     </div>
 
     <div class="admin-list">
@@ -149,6 +169,37 @@
               <div class="admin-edit-actions">
                 <button class="button" type="submit">Save</button>
                 <button class="button danger" type="submit" formaction="?/deleteDop">
+                  Delete
+                </button>
+              </div>
+            </form>
+          {/each}
+        </div>
+      </div>
+      <div>
+        <h2>Post-production</h2>
+        <div class="admin-edit-list">
+          {#each content.postProduction || [] as artist (artist.id || artist.slug || artist.name)}
+            {@const artistWork = resolveSelectedWork(artist.selectedWork)}
+            <form class="admin-edit" method="post" action="?/updatePostProduction">
+              <input type="hidden" name="id" value={artist.id || artist.slug} />
+              <div class="admin-edit-id">ID: {artist.id || artist.slug}</div>
+              <label>
+                Name
+                <input name="name" value={artist.name} required />
+              </label>
+              <label>
+                Reel URL
+                <input name="reelUrl" value={artist.reelUrl} />
+              </label>
+              <label>
+                Bio (optional)
+                <textarea name="bio" rows="3">{artist.bio}</textarea>
+              </label>
+              <WorkListEditor name="selectedWork" value={artistWork} />
+              <div class="admin-edit-actions">
+                <button class="button" type="submit">Save</button>
+                <button class="button danger" type="submit" formaction="?/deletePostProduction">
                   Delete
                 </button>
               </div>

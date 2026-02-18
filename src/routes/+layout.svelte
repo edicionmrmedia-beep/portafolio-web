@@ -10,6 +10,7 @@
     { href: "/about", label: "About" },
     { href: "/directors", label: "Directors" },
     { href: "/dops", label: "DOPs" },
+    { href: "/post-production", label: "Post-production" },
     { href: "/work", label: "Work" },
     { href: "/contact", label: "Contact" },
   ];

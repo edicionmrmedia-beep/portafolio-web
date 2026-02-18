@@ -5,6 +5,8 @@ const defaultBio =
   'Director focused on advertising and branded content, with experience leading campaigns for global brands and premium talent.';
 const defaultDopBio =
   'Cinematographer specializing in high-end advertising and branded content productions.';
+const defaultPostProductionBio =
+  'Post-production specialist focused on finishing, color, and editorial for premium advertising and branded content.';
 
 const matchesId = (item, id) => item?.id === id || item?.slug === id;
 
@@ -190,6 +192,57 @@ export const actions = {
 
     return { success: true, message: 'Work added.' };
   },
+  addPostProduction: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const name = form.get('name')?.toString().trim();
+    const reelUrl = form.get('reelUrl')?.toString().trim();
+    const bio = form.get('bio')?.toString().trim();
+    const selectedRaw = form.get('selectedWork')?.toString().trim();
+
+    if (!name) {
+      return fail(400, { message: 'Name is required.' });
+    }
+
+    const id = slugify(name);
+
+    if (!id) {
+      return fail(400, { message: 'Name must include letters or numbers.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          content.postProduction = content.postProduction || [];
+          if (content.postProduction.some((item) => matchesId(item, id))) {
+            throw new Error('Post-production artist already exists.');
+          }
+
+          const artist = {
+            id,
+            name,
+            bio: bio || defaultPostProductionBio,
+            reelUrl: reelUrl || 'https://player.vimeo.com/video/76979871',
+            selectedWork
+          };
+
+          content.postProduction.push(artist);
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to add post-production.' });
+    }
+
+    return { success: true, message: 'Post-production added.' };
+  },
   updateDirector: async ({ request, fetch, url }) => {
     const form = await request.formData();
     const id = form.get('id')?.toString().trim();
@@ -235,6 +288,53 @@ export const actions = {
 
     return { success: true, message: 'Director updated.' };
   },
+  updatePostProduction: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+    const name = form.get('name')?.toString().trim();
+    const reelUrl = form.get('reelUrl')?.toString().trim();
+    const bio = form.get('bio')?.toString().trim();
+    const selectedRaw = form.get('selectedWork')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Post-production id is required.' });
+    }
+
+    if (!name) {
+      return fail(400, { message: 'Name is required.' });
+    }
+
+    let selectedWork = [];
+    try {
+      selectedWork = parseSelectedWork(selectedRaw);
+    } catch (error) {
+      return fail(400, { message: error.message || 'Invalid work list.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const list = content.postProduction || [];
+          const artist = list.find((item) => matchesId(item, id));
+          if (!artist) {
+            throw new Error('Post-production artist not found.');
+          }
+
+          artist.name = name;
+          artist.reelUrl = reelUrl || artist.reelUrl || 'https://player.vimeo.com/video/76979871';
+          artist.bio = bio || artist.bio || defaultPostProductionBio;
+          artist.selectedWork = selectedWork;
+          content.postProduction = list;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to update post-production.' });
+    }
+
+    return { success: true, message: 'Post-production updated.' };
+  },
   deleteDirector: async ({ request, fetch, url }) => {
     const form = await request.formData();
     const id = form.get('id')?.toString().trim();
@@ -261,6 +361,34 @@ export const actions = {
     }
 
     return { success: true, message: 'Director deleted.' };
+  },
+  deletePostProduction: async ({ request, fetch, url }) => {
+    const form = await request.formData();
+    const id = form.get('id')?.toString().trim();
+
+    if (!id) {
+      return fail(400, { message: 'Post-production id is required.' });
+    }
+
+    try {
+      await updateContent(
+        (content) => {
+          const list = content.postProduction || [];
+          const next = list.filter((item) => !matchesId(item, id));
+          if (next.length === list.length) {
+            throw new Error('Post-production artist not found.');
+          }
+
+          content.postProduction = next;
+          return content;
+        },
+        { fetch, url }
+      );
+    } catch (error) {
+      return fail(400, { message: error.message || 'Unable to delete post-production.' });
+    }
+
+    return { success: true, message: 'Post-production deleted.' };
   },
   updateDop: async ({ request, fetch, url }) => {
     const form = await request.formData();
